@@ -1,0 +1,102 @@
+// Centered Multiline Text - GMEM
+//@gmem=XR_SelTrackItemsNotes
+
+/**
+ * Video Processor Preset: Centered Multiline Text - GMEM
+ * Author: X-Raym
+ * Author URI: https://www.extremraym.com
+ * About: Mod from Fabian's Centered Multiline Text and JT: Essential Text Overlay, but with GMEM support
+ * Licence: GPL v3
+ * Version: 1.0
+ * Version Date: 2022-11-23
+ */
+
+// USER CONFIG AREA
+
+font ="Futura";
+
+// END OF USER CONFIG AREA
+
+//@param1:size 'Text height' 0.1 0.01 0.3 0.1 0.01
+
+//@param3:ypos 'Y position' 0.5 -0.5 1.5 0.5 0.01
+
+//@param5:txtr 'Text R' 1 0 1 0.5 0.01
+//@param6:txtg 'Text G' 1 0 1 0.5 0.01
+//@param7:txtb 'Text B' 1 0 1 0.5 0.01
+//@param8:fga 'Text opacity' 1 0 1 0.5 0.01
+
+//@param10:border 'BG Size' 0.25 -0.5 15 2 0.25
+//@param11:bgred 'BG R' 0 0 1 0.5 0.01
+//@param12:bggreen 'BG G' 0 0 1 0.5 0.01 
+//@param13:bgblue 'BG B' 0 0 1 0.5 0.01 
+//@param14:bga 'BG opacity' 0 0 1 0.5 0.01
+
+// https://forum.cockos.com/showthread.php?t=214162
+function gmem_read_string(index, output) local(offset, buf) (
+  offset = 0;
+  buf = #;
+
+  while (
+    gmem[index] ? (
+      str_setchar(buf, offset, gmem[index]);
+      offset += 1;
+      index  += 1;
+    ) : 0;
+  );
+  
+  strcpy_substr(output, buf, 0, offset); // truncates the output
+);
+
+// Thanks Fabian's for the centered multiline print functions!
+function printc(str)
+(
+  gfx_str_measure(str, txtw, txth);
+  gfx_x = (project_w - txtw)/2;
+  
+  gfx_str_draw(str, gfx_x, gfx_y);
+  txth; // return text height
+);
+
+function dosplit(fmt, txt)
+(
+  ptr = 0;
+  strcpy(ptr, txt);
+  count = 0;
+  while
+  (
+    retval = match(fmt, ptr, ptr+2, ptr+1);
+    ptr += 2;
+    count += 1;
+    retval;
+  );
+  strcpy(ptr-1, ptr-2);
+  count; // return number of strings
+);
+
+// Init
+text = #; // or #whatever
+gmem_read_string(0, text); // set to string to override
+gfx_blit(0,1);
+
+// Measure text
+gfx_setfont(size*project_h,font);
+gfx_str_measure(text,txtw,txth);
+yt = (project_h- txth*(1+border*2))*ypos;
+
+// Draw background
+gfx_r =(bgred); gfx_g =(bggreen); gfx_b =(bgblue);
+gfx_set(bgred,bggreen,bgblue,bga);
+gfx_fillrect(0, yt, project_w, txth*(1+border*2));
+
+// Draw text
+gfx_r =(txtr); gfx_g =(txtg); gfx_b =(txtb);
+gfx_set(txtr,txtg,txtb,fga);
+
+#fmt = "%s\n%s";
+count = dosplit(#fmt, text);
+gfx_y = yt+txth*border;
+loop(count,
+  gfx_y += printc(2*count-1);
+  count -= 1;
+);
