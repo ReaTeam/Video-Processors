@@ -1,15 +1,60 @@
-input = 0;
-project_wh_valid===0 ? input_info(input, project_w, project_h);
-gfx_y = 0;
+// Centered Multiline Text
 
-gfx_set(0, 0, 0, 1);
-gfx_fillrect(0, 0, project_w, project_h);
-gfx_set(1, 1, 1, 1);
+/**
+ * Video Processor Preset: Centered Multiline Text
+ * Author: Fabian, X-Raym
+ * About: Mod from JT: Essential Text Overlay, to add GMEM support
+ * Links:
+     Cockos Forum Thread https://forum.cockos.com/showthread.php?t=174202
+     Repository - ReaTeam Video Processors https://github.com/ReaTeam/Video-Processors
+ * Licence: GPL v3
+ * Version: 1.0
+ * Version Date: 2022-11-23
+ */
+ 
+/**
+ * Changelog:
+ * v1.1 (2022-11-23)
+   + Header and Changelog
+   + Font family text variable
+   + Font size, background and ypos related variables
+ * v1.0 (2022-23-11)
+   + Initial Release by Fabian
+ */
+
+// USER CONFIG AREA
+
+#text="Video\nProcessor"; // set to string to override
+font="Arial";
+
+// END OF USER CONFIG AREA
+
+//@param1:size 'text height' 0.05 0.01 0.2 0.1 0.001
+//@param2:ypos 'y position' 0.95 0 1 0.5 0.01
+//@param4:border 'border' 0 0 1 0.5 0.01
+//@param5:fgc 'text bright' 1.0 0 1 0.5 0.01
+//@param6:fga 'text alpha' 1.0 0 1 0.5 0.01
+//@param7:bgc 'bg bright' 0.75 0 1 0.5 0.01
+//@param8:bga 'bg alpha' 0.5 0 1 0.5 0.01
+//@param10:ignoreinput 'ignore input' 0 0 1 0.5 1
+
+input = ignoreinput ? -2:0;
+project_wh_valid===0 ? input_info(input,project_w,project_h);
+gfx_a2=0;
+gfx_blit(input,1);
+gfx_setfont(size*project_h,font);
+strcmp(#text,"")==0 ? input_get_name(-1,#text);
+gfx_str_measure(#text,txtw,txth);
+yt = (project_h- txth*(1+border*2))*ypos;
+gfx_set(bgc,bgc,bgc,bga);
+gfx_fillrect(0, yt, project_w, txth*(1+border*2));
+gfx_set(fgc,fgc,fgc,fga);
 
 function printc(str)
 (
   gfx_str_measure(str, txtw, txth);
   gfx_x = (project_w - txtw)/2;
+  
   gfx_str_draw(str, gfx_x, gfx_y);
   txth; // return text height
 );
@@ -31,10 +76,9 @@ function dosplit(fmt, txt)
 );
 
 #fmt = "%s\n%s";
-#text="What do You think of that?\nAwesome!\nRight?\nRIGHT?!\n... or wrong.";
 count = dosplit(#fmt, #text);
-
-  loop(count,
-    gfx_y += printc(2*count-1);
-    count -= 1;
-  );
+gfx_y = yt+txth*border;
+loop(count,
+  gfx_y += printc(2*count-1);
+  count -= 1;
+);
