@@ -1,0 +1,40 @@
+input = 0;
+project_wh_valid===0 ? input_info(input, project_w, project_h);
+gfx_y = 0;
+
+gfx_set(0, 0, 0, 1);
+gfx_fillrect(0, 0, project_w, project_h);
+gfx_set(1, 1, 1, 1);
+
+function printc(str)
+(
+  gfx_str_measure(str, txtw, txth);
+  gfx_x = (project_w - txtw)/2;
+  gfx_str_draw(str, gfx_x, gfx_y);
+  txth; // return text height
+);
+
+function dosplit(fmt, txt)
+(
+  ptr = 0;
+  strcpy(ptr, txt);
+  count = 0;
+  while
+  (
+    retval = match(fmt, ptr, ptr+2, ptr+1);
+    ptr += 2;
+    count += 1;
+    retval;
+  );
+  strcpy(ptr-1, ptr-2);
+  count; // return number of strings
+);
+
+#fmt = "%s\n%s";
+#text="What do You think of that?\nAwesome!\nRight?\nRIGHT?!\n... or wrong.";
+count = dosplit(#fmt, #text);
+
+  loop(count,
+    gfx_y += printc(2*count-1);
+    count -= 1;
+  );
