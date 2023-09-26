@@ -7,8 +7,8 @@
  * Author URI: https://www.extremraym.com
  * About: Mod from Fabian's Centered Multiline Text and JT: Essential Text Overlay, but with GMEM support
  * Licence: GPL v3
- * Version: 1.0
- * Version Date: 2022-11-23
+ * Version: 1.1
+ * Version Date: 2023-09-26
  */
 
 // USER CONFIG AREA
@@ -18,7 +18,7 @@ font ="Futura";
 // END OF USER CONFIG AREA
 
 //@param1:size 'Text height' 0.1 0.01 0.3 0.1 0.01
-
+//@param2:xpos 'X offset' 0.0 -1 1.0 0.5 0.01
 //@param3:ypos 'Y position' 0.5 -0.5 1.5 0.5 0.01
 
 //@param5:txtr 'Text R' 1 0 1 0.5 0.01
@@ -52,7 +52,7 @@ function gmem_read_string(index, output) local(offset, buf) (
 function printc(str)
 (
   gfx_str_measure(str, txtw, txth);
-  gfx_x = (project_w - txtw)/2;
+  gfx_x = (project_w - txtw)/2 + xpos * project_w;
   
   gfx_str_draw(str, gfx_x, gfx_y);
   txth; // return text height
